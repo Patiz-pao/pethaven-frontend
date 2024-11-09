@@ -8,10 +8,12 @@ const Navbar = () => {
   const { isOpen, isMobile, toggleNav } = useToggleNavbar();
 
   return (
-    <nav className="bg-blue-50 py-2 z-50">
+    <nav className="bg-orange-100 py-2 shadow-lg border-b-2 border-orange-300 z-50">
       <div className="container mx-auto text-center lg:px-0 lg:p-0">
         <div className="h-auto">
-          <div className="text-blue-600 text-2xl font-bold py-4">PetHaven</div>
+          <div className="text-blue-600 text-2xl font-bold py-4">
+            PetHaven
+          </div>
 
           {isMobile && (
             <button
