@@ -1,8 +1,9 @@
-export default function Home() {
+import HomePage from "./home/page";
 
+export default function Home() {
   return (
     <div>
-      <p>1234</p>
+      <HomePage />
     </div>
   );
 }
