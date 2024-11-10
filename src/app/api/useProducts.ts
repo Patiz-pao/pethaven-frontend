@@ -26,8 +26,8 @@ export const useProducts = (): UseProductsReturn => {
 
   const filteredProducts = products.filter(
       (product) =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchTerm.toLowerCase())
+      product.name ||
+      product.category
       
   );
 
