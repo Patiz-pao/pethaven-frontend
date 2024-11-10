@@ -7,12 +7,18 @@ export const useProducts = (): UseProductsReturn => {
   const [products, setProducts] = useState<Product[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get("/api/products");
         setProducts(response.data.data);
+        setShowSuccessPopup(true);
+
+        setTimeout(() => {
+          setShowSuccessPopup(false);
+        }, 3000);
       } catch (err) {
         console.error("Error fetching products:", err);
         setError("ไม่สามารถดึงข้อมูลสินค้าได้");
@@ -24,19 +30,12 @@ export const useProducts = (): UseProductsReturn => {
     fetchProducts();
   }, []);
 
-  const filteredProducts = products.filter(
-      (product) =>
-      product.name ||
-      product.category
-      
-  );
-
   return {
     products,
     loading,
     error,
     searchTerm,
     setSearchTerm,
-    filteredProducts,
+    showSuccessPopup,
   };
 };

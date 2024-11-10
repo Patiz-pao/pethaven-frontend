@@ -1,12 +1,43 @@
 "use client";
 import React from "react";
-import { Search, ShoppingCart, Plus } from "lucide-react";
+import { Search, ShoppingCart, Plus, Star } from "lucide-react";
 import { useProducts } from "@/app/api/useProducts";
 import Link from "next/link";
 
+type RatingStarsProps = {
+  rating: number;
+};
+
+const RatingStars = ({ rating }: RatingStarsProps) => {
+  const fullStars = Math.floor(rating);
+  const halfStar = rating % 1 >= 0.5 ? 1 : 0;
+  const emptyStars = 5 - fullStars - halfStar;
+
+  return (
+    <div className="flex">
+      {Array(fullStars)
+        .fill(0)
+        .map((_, index) => (
+          <Star key={`full-${index}`} className="text-yellow-500" />
+        ))}
+      {halfStar === 1 && (
+        <Star
+          key="half"
+          className="text-yellow-500"
+          style={{ clipPath: "inset(0 50% 0 0)" }}
+        />
+      )}
+      {Array(emptyStars)
+        .fill(0)
+        .map((_, index) => (
+          <Star key={`empty-${index}`} className="hidden" />
+        ))}
+    </div>
+  );
+};
+
 const Products = () => {
-  const { loading, error, searchTerm, setSearchTerm, filteredProducts } =
-    useProducts();
+  const { loading, error, searchTerm, setSearchTerm, products } = useProducts();
 
   if (loading) {
     return (
@@ -24,7 +55,10 @@ const Products = () => {
       <div className="container mx-auto px-4 py-6">
         <div className="flex items-center justify-end">
           <div className="flex items-center gap-4">
-            <Link href="/addproducts" className="p-2 rounded-full bg-purple-100 hover:bg-purple-200">
+            <Link
+              href="products/add"
+              className="p-2 rounded-full bg-purple-100 hover:bg-purple-200"
+            >
               <Plus className="text-purple-600" size={24} />
             </Link>
             <div className="relative">
@@ -53,24 +87,29 @@ const Products = () => {
 
       <main className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {filteredProducts.map((product, index) => (
+          {products.map((product, index) => (
             <div
               key={index}
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full"
             >
               <img
                 src={product.imageUrl}
                 alt={product.name}
-                className="w-full h-48 object-contain"
+                className="w-full h-48 object-contain p-2"
               />
-              <div className="p-4">
-                <h2 className="text-lg font-semibold">{product.name}</h2>
-                <p className="text-gray-600 text-sm mb-2 font-bold">
-                  {product.brand}
-                </p>
-                <p className="text-gray-600 text-sm mb-2">
-                  {product.description}
-                </p>
+              <div className="p-4 flex-grow flex flex-col justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold">{product.name}</h2>
+                  <p className="text-gray-600 text-sm mb-2 font-bold">
+                    {product.brand}
+                  </p>
+                  <p className="text-gray-600 text-sm mb-2">
+                    {product.description}
+                  </p>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <RatingStars rating={product.rating} />
+                </div>
                 <div className="flex items-center justify-between mt-4">
                   <span className="text-purple-600 font-bold">
                     ฿{product.price.toLocaleString()}

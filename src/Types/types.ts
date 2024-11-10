@@ -6,6 +6,7 @@ export interface Product {
   category: string;
   imageUrl: string;
   brand: string;
+  rating: number;
 }
 
 export interface UseProductsReturn {
@@ -14,5 +15,5 @@ export interface UseProductsReturn {
   error: string | null;
   searchTerm: string;
   setSearchTerm: (term: string) => void;
-  filteredProducts: Product[];
+  showSuccessPopup: boolean;
 }
