@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { Product, UseProductsReturn } from "../Types/types";
+import { Product, UseProductsReturn } from "../../Types/types";
 
 export const useProducts = (): UseProductsReturn => {
   const [searchTerm, setSearchTerm] = useState("");
