@@ -5,6 +5,7 @@ import { Product, UseProductsReturn } from "../../Types/types";
 export const useProducts = (): UseProductsReturn => {
   const [searchTerm, setSearchTerm] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -30,8 +31,21 @@ export const useProducts = (): UseProductsReturn => {
     fetchProducts();
   }, []);
 
+  useEffect(() => {
+    if (searchTerm === "") {
+      setFilteredProducts(products);
+    } else {
+      setFilteredProducts(
+        products.filter((product) =>
+          product.name.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    }
+  }, [searchTerm, products]);
+
   return {
     products,
+    filteredProducts,
     loading,
     error,
     searchTerm,

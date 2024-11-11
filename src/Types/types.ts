@@ -16,4 +16,5 @@ export interface UseProductsReturn {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   showSuccessPopup: boolean;
+  filteredProducts:Product[];
 }
