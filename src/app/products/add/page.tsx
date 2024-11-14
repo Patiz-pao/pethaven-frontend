@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Switch, Textarea, Input, Label, Button } from "@/components/ui/";
 import axios from "axios";
-import { Plus } from "lucide-react";
+import { CircleCheckBig, Plus } from "lucide-react";
 
 import {
   Select,
@@ -14,6 +14,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
 
 const AddProducts = () => {
@@ -22,8 +34,8 @@ const AddProducts = () => {
     control,
     register,
     handleSubmit,
-    watch,
     setValue,
+    trigger,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -43,12 +55,13 @@ const AddProducts = () => {
   });
 
   const [categories, setCategories] = useState([
-    { value: "Y", label: "Cat" },
-    { value: "N", label: "Dog" },
+    { value: "Cat", label: "Cat" },
+    { value: "Dog", label: "Dog" },
   ]);
   const [newCategory, setNewCategory] = useState("");
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const onSubmit = async (data: any) => {
     const payload = {
@@ -67,8 +80,9 @@ const AddProducts = () => {
       console.log(response.data);
       setShowSuccessPopup(true);
       setTimeout(() => {
+        setIsDialogOpen(false);
         router.push("/products");
-      }, 1000);
+      }, 2000);
     } catch (error) {
       console.error("Error submitting form:", error);
     }
@@ -87,17 +101,18 @@ const AddProducts = () => {
     }
   };
 
+  const handleOpenDialog = async () => {
+    const isValid = await trigger();
+    if (isValid) {
+      setIsDialogOpen(true);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-blue-100 py-8">
       <div className="container mx-auto max-w-2xl">
         <div className="bg-white rounded-lg shadow-lg p-6">
           <h1 className="text-2xl font-bold mb-6">Add New Product</h1>
-
-          {showSuccessPopup && (
-            <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-green-500 text-white p-6 rounded-lg shadow-lg z-50">
-              <p>Product added successfully!</p>
-            </div>
-          )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
@@ -279,7 +294,7 @@ const AddProducts = () => {
                   control={control}
                   rules={{ required: "Status is required" }}
                   render={({ field }) => (
-                    <Select {...field}>
+                    <Select {...field} onValueChange={field.onChange}>
                       <SelectTrigger
                         className={`${
                           errors.status ? "border-red-500" : "border-gray-300"
@@ -306,49 +321,84 @@ const AddProducts = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="imageUrl">Product Image</Label>
-
               <Controller
                 name="imageUrl"
                 control={control}
+                rules={{
+                  required: "Image URL is required",
+                  pattern: {
+                    value: /^(ftp|http|https):\/\/[^ "]+$/,
+                    message: "Invalid URL format",
+                  },
+                }}
                 render={({ field }) => (
-                  <Input
-                    id="imageUrl"
-                    type="text"
-                    placeholder="Enter Image URL"
-                    {...field} // Controller will handle onChange here
-                    className={`${
-                      errors.imageUrl ? "border-red-500" : "border-gray-300"
-                    } w-full rounded-md border p-2`}
-                  />
-                )}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Controller
-                name="isFeatured"
-                control={control}
-                render={({ field }) => (
-                  <div className="flex items-center">
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                      className="w-12 h-6 bg-blue-500 rounded-full"
+                  <div className="space-y-2">
+                    <Label htmlFor="imageUrl">Product Image</Label>
+                    <Input
+                      id="imageUrl"
+                      type="text"
+                      placeholder="Enter Image URL"
+                      {...field}
+                      className={`${
+                        errors.imageUrl ? "border-red-500" : "border-gray-300"
+                      } w-full rounded-md border p-2`}
                     />
-                    <Label className="ml-4">Featured</Label>
                   </div>
                 )}
               />
             </div>
 
             <div className="mt-6">
-              <Button
-                type="submit"
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-md p-3"
-              >
-                Add Product
-              </Button>
+              <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <Button
+                  type="button"
+                  onClick={handleOpenDialog}
+                  className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-md p-3"
+                  variant="outline"
+                >
+                  Add Product
+                </Button>
+
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    {showSuccessPopup ? (
+                      <div className="flex flex-col items-center justify-center p-4">
+                        <CircleCheckBig className="w-16 h-16 text-green-500 mb-4" />
+                        <div className="text-center">
+                          <h2 className="text-2xl font-bold text-green-600 mb-2">
+                            Success!
+                          </h2>
+                          <p className="text-gray-600">
+                            Product has been successfully added.
+                          </p>
+                          <p className="text-gray-500 text-sm mt-2">
+                            Redirecting to products page...
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <AlertDialogTitle>
+                          Confirm Create Product
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to add this product to your
+                          store?
+                        </AlertDialogDescription>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            className="bg-blue-500 hover:bg-blue-600"
+                            onClick={handleSubmit(onSubmit)}
+                          >
+                            Confirm
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </>
+                    )}
+                  </AlertDialogHeader>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
           </form>
         </div>
