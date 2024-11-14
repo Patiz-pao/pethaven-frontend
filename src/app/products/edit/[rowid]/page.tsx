@@ -1,7 +1,13 @@
-import { Suspense, lazy } from "react";
-import AddProductForm from "./AddProductForm";
+import { Suspense } from "react";
+import EditProductForm from "./EditProductForm";
 
-export default function EditPage() {
+interface PageProps {
+  params: Promise<{ rowid: string }>;
+}
+
+export default async function EditPage({ params }: PageProps) {
+  const product = await params;
+
   return (
     <Suspense
       fallback={
@@ -17,7 +23,7 @@ export default function EditPage() {
         </div>
       }
     >
-      <AddProductForm />
+      <EditProductForm rowId={product.rowid} />
     </Suspense>
   );
 }
