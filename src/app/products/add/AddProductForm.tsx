@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Switch, Textarea, Input, Label, Button } from "@/components/ui/";
 import axios from "axios";
@@ -27,11 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
 
-interface EditProductProps {
-  rowId: string;
-}
-
-const EditProduct = ({ rowId }: EditProductProps) => {
+const AddProducts = () => {
   const router = useRouter();
   const {
     control,
@@ -40,7 +36,6 @@ const EditProduct = ({ rowId }: EditProductProps) => {
     setValue,
     trigger,
     formState: { errors },
-    reset,
   } = useForm({
     defaultValues: {
       name: "",
@@ -49,7 +44,7 @@ const EditProduct = ({ rowId }: EditProductProps) => {
       category: "",
       stockQuantity: "",
       imageUrl: "",
-      status: "",
+      status: "N",
       sku: "",
       brand: "",
       rating: "",
@@ -66,42 +61,6 @@ const EditProduct = ({ rowId }: EditProductProps) => {
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Fetch product data
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const response = await axios.get(`/api/products/${rowId}`);
-        const productData = response.data.data;
-
-        // Reset form with fetched data
-        reset({
-          name: productData.name,
-          description: productData.description,
-          price: productData.price.toString(),
-          category: productData.category,
-          stockQuantity: productData.stockQuantity.toString(),
-          imageUrl: productData.imageUrl,
-          status: productData.status,
-          sku: productData.sku,
-          brand: productData.brand,
-          rating: productData.rating.toString(),
-          discountPrice: productData.discountPrice?.toString() || "",
-          isFeatured: productData.isFeatured,
-        });
-
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching product:", error);
-        setIsLoading(false);
-      }
-    };
-
-    if (rowId) {
-      fetchProduct();
-    }
-  }, [rowId, reset]);
 
   const onSubmit = async (data: any) => {
     const payload = {
@@ -109,12 +68,14 @@ const EditProduct = ({ rowId }: EditProductProps) => {
       price: parseFloat(data.price),
       stockQuantity: parseInt(data.stockQuantity),
       rating: parseFloat(data.rating),
-      discountPrice: data.discountPrice ? parseFloat(data.discountPrice) : null,
+      discountPrice: parseFloat(data.discountPrice),
+      createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
     try {
-      const response = await axios.put(`/api/products/${rowId}`, payload);
+      console.log("Sending payload:", payload);
+      const response = await axios.post("/api/products", payload);
       console.log(response.data);
       setShowSuccessPopup(true);
       setTimeout(() => {
@@ -122,7 +83,7 @@ const EditProduct = ({ rowId }: EditProductProps) => {
         router.push("/products");
       }, 2000);
     } catch (error) {
-      console.error("Error updating product:", error);
+      console.error("Error submitting form:", error);
     }
   };
 
@@ -146,26 +107,11 @@ const EditProduct = ({ rowId }: EditProductProps) => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex items-center justify-center bg-white">
-          <div className="relative">
-            <div className="w-16 h-16 rounded-full border-4 border-blue-200 animate-spin border-t-blue-500" />
-            <div className="mt-4 text-center text-blue-500 font-medium animate-pulse">
-            Loading...
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-blue-100 py-8">
       <div className="container mx-auto max-w-2xl">
         <div className="bg-white rounded-lg shadow-lg p-6">
-          <h1 className="text-2xl font-bold mb-6">Edit Product</h1>
+          <h1 className="text-2xl font-bold mb-6">Add New Product</h1>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
@@ -409,7 +355,7 @@ const EditProduct = ({ rowId }: EditProductProps) => {
                   className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-md p-3"
                   variant="outline"
                 >
-                  Update Product
+                  Add Product
                 </Button>
 
                 <AlertDialogContent>
@@ -422,7 +368,7 @@ const EditProduct = ({ rowId }: EditProductProps) => {
                             Success!
                           </h2>
                           <p className="text-gray-600">
-                            Product has been successfully updated.
+                            Product has been successfully added.
                           </p>
                           <p className="text-gray-500 text-sm mt-2">
                             Redirecting to products page...
@@ -432,10 +378,11 @@ const EditProduct = ({ rowId }: EditProductProps) => {
                     ) : (
                       <>
                         <AlertDialogTitle>
-                          Confirm Update Product
+                          Confirm Create Product
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                          Are you sure you want to update this product?
+                          Are you sure you want to add this product to your
+                          store?
                         </AlertDialogDescription>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
@@ -459,4 +406,4 @@ const EditProduct = ({ rowId }: EditProductProps) => {
   );
 };
 
-export default EditProduct;
+export default AddProducts;

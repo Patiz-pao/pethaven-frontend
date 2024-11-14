@@ -63,10 +63,14 @@ const Products = () => {
 
   if (loading) {
     return (
-      <div className="bg-blue-100 opacity-80 min-h-screen flex items-center justify-center">
-        <div className="flex items-center space-x-2 z-10">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600"></div>
-          <div className="text-blue-600 font-semibold">Loading...</div>
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="flex items-center justify-center bg-white">
+          <div className="relative">
+            <div className="w-16 h-16 rounded-full border-4 border-blue-200 animate-spin border-t-blue-500" />
+            <div className="mt-4 text-center text-blue-500 font-medium animate-pulse">
+              Loading...
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -143,7 +147,7 @@ const Products = () => {
                   className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full"
                 >
                   <div className="flex gap-3 justify-end py-2 px-3 bg-purple-600 shadow-xl">
-                  <Link href={`/products/edit/${product.rowid}`} passHref>
+                    <Link href={`/products/edit/${product.rowid}`} passHref>
                       <Pencil className="h-4 w-4 text-white" />
                     </Link>
                     <button>
