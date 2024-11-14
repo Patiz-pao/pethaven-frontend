@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Plus, Star } from "lucide-react";
+import { Pencil, Plus, Star, Trash2 } from "lucide-react";
 import { useProducts } from "@/app/api/useProducts";
 import Link from "next/link";
 import { Slider } from "@/components/ui/slider";
@@ -21,7 +21,6 @@ const RatingStars = ({ rating }: RatingStarsProps) => {
   const fullStars = Math.floor(rating);
   const halfStar = rating % 1 >= 0.5 ? 1 : 0;
   const emptyStars = 5 - fullStars - halfStar;
-
   return (
     <div className="flex">
       {Array(fullStars)
@@ -46,7 +45,7 @@ const RatingStars = ({ rating }: RatingStarsProps) => {
 };
 
 const Products = () => {
-  const { loading, searchTerm, setSearchTerm, products } = useProducts();
+  const { loading, products } = useProducts();
   const [priceRange, setPriceRange] = useState([0, 5000]);
   const [selectedBrand, setSelectedBrand] = useState("all");
 
@@ -72,7 +71,6 @@ const Products = () => {
       </div>
     );
   }
-
   return (
     <div className="min-h-screen bg-blue-100">
       <div className="container mx-auto px-4 py-6">
@@ -144,6 +142,14 @@ const Products = () => {
                   key={index}
                   className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full"
                 >
+                  <div className="flex gap-3 justify-end py-2 px-3 bg-purple-600 shadow-xl">
+                  <Link href={`/products/edit/${product.rowid}`} passHref>
+                      <Pencil className="h-4 w-4 text-white" />
+                    </Link>
+                    <button>
+                      <Trash2 className="h-4 w-4 text-white" />
+                    </button>
+                  </div>
                   <img
                     src={product.imageUrl}
                     alt={product.name}
