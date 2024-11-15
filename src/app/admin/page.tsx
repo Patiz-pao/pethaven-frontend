@@ -4,6 +4,8 @@ import { Table } from "@/components/ui/table";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Toaster, useToast } from "@/components/ui/toaster";
+import Link from "next/link";
+import { CircleArrowLeft } from "lucide-react";
 
 interface Product {
   rowid: string;
@@ -11,8 +13,6 @@ interface Product {
   price: number;
   status: string;
 }
-
-interface ProductsReq {}
 
 const AdminPage = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -50,14 +50,12 @@ const AdminPage = () => {
   const handleStatusChange = async (rowid: string, currentStatus: string) => {
     try {
       const newStatus = currentStatus === "N" ? "Y" : "N";
-      const productsReq = {};
 
       const response = await fetch(`/api/status/${rowid}/${newStatus}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(productsReq),
       });
 
       if (!response.ok) {
@@ -121,7 +119,13 @@ const AdminPage = () => {
         <div className="p-0 sm:p-8">
           <Card>
             <CardHeader>
-              <CardTitle>จัดการสินค้า ({products.length})</CardTitle>
+              <Link href="/products">
+                <div className="flex items-center gap-2 mb-3 text-blue-500 hover:text-blue-700 font-medium transition duration-300">
+                  <CircleArrowLeft className="h-6 w-6" />
+                  <span>Back</span>
+                </div>
+              </Link>
+              <CardTitle className="text-xl font-bold">จัดการสินค้า ({products.length})</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="rounded-md border">

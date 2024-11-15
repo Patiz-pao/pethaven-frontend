@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Textarea, Input, Label, Button } from "@/components/ui/";
 import axios from "axios";
-import { CircleCheckBig, Plus } from "lucide-react";
+import { CircleArrowLeft, CircleCheckBig, Plus } from "lucide-react";
 
 import {
   Select,
@@ -26,6 +26,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface EditProductProps {
   rowId: string;
@@ -83,7 +84,6 @@ const EditProduct = ({ rowId }: EditProductProps) => {
 
         console.log(categoryData);
         console.log(matchingCategory.name);
-        
 
         reset({
           name: productData.name,
@@ -218,6 +218,12 @@ const EditProduct = ({ rowId }: EditProductProps) => {
     <div className="min-h-screen bg-blue-100 py-8">
       <div className="container mx-auto max-w-2xl">
         <div className="bg-white rounded-lg shadow-lg p-6">
+          <Link href="/products">
+            <div className="flex items-center gap-2 mb-3 text-blue-500 hover:text-blue-700 font-medium transition duration-300">
+              <CircleArrowLeft className="h-6 w-6" />
+              <span>Back to Products</span>
+            </div>
+          </Link>
           <h1 className="text-2xl font-bold mb-6">Edit Product</h1>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
