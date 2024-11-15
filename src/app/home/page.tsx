@@ -6,7 +6,7 @@ const Home = () => {
     <div className="min-h-screen bg-blue-50">
       <div className="bg-blue-300 py-16 text-center">
         <h1 className="text-4xl font-bold text-white">
-          ยินดีต้อนรับสู่ Pet Paradise!
+          ยินดีต้อนรับสู่ Pet Haven Shop!
         </h1>
         <p className="text-lg text-white mt-4">
           แหล่งรวมสินค้าและบริการสำหรับสัตว์เลี้ยงที่คุณรัก
