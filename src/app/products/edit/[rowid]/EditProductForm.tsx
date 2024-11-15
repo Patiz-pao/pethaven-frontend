@@ -58,29 +58,38 @@ const EditProduct = ({ rowId }: EditProductProps) => {
     },
   });
 
-  const [categories, setCategories] = useState([
-    { value: "Cat", label: "Cat" },
-    { value: "Dog", label: "Dog" },
-  ]);
+  const [categories, setCategories] = useState<
+    { value: string; label: string }[]
+  >([]);
   const [newCategory, setNewCategory] = useState("");
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch product data
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const response = await axios.get(`/api/products/${rowId}`);
         const productData = response.data.data;
 
-        // Reset form with fetched data
+        const category = await axios.get(`/api/category`);
+        const categoryData = category.data.data;
+
+        const matchingCategory = categoryData.find(
+          (cat: { rowid: string; name: string }) =>
+            cat.name === productData.category
+        );
+
+        console.log(categoryData);
+        console.log(matchingCategory.name);
+        
+
         reset({
           name: productData.name,
           description: productData.description,
           price: productData.price.toString(),
-          category: productData.category,
+          category: matchingCategory ? matchingCategory.name : "test",
           stockQuantity: productData.stockQuantity.toString(),
           imageUrl: productData.imageUrl,
           status: productData.status,
@@ -126,16 +135,56 @@ const EditProduct = ({ rowId }: EditProductProps) => {
     }
   };
 
-  const handleAddCategory = () => {
+  const getCategories = async () => {
+    try {
+      const response = await axios.get("/api/category");
+
+      if (Array.isArray(response.data)) {
+        const fetchedCategories = response.data.map(
+          (category: { name: string; rowid: string }) => ({
+            label: category.name,
+            value: category.rowid,
+          })
+        );
+        setCategories(fetchedCategories);
+      } else if (
+        response.data &&
+        response.data.data &&
+        Array.isArray(response.data.data)
+      ) {
+        const fetchedCategories = response.data.data.map(
+          (category: { name: string; rowid: string }) => ({
+            label: category.name,
+            value: category.rowid,
+          })
+        );
+        setCategories(fetchedCategories);
+      } else {
+        console.error(
+          "Invalid data format: response.data is not an array or doesn't have 'data' array"
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  const handleAddCategory = async () => {
     if (newCategory.trim()) {
-      const newCategoryObj = {
-        value: newCategory.trim(),
-        label: newCategory.trim(),
-      };
-      setCategories((prevCategories) => [...prevCategories, newCategoryObj]);
-      setValue("category", newCategory.trim());
-      setNewCategory("");
-      setShowAddCategory(false);
+      try {
+        const response = await axios.post("/api/category", {
+          name: newCategory.trim(),
+        });
+        setCategories((prevCategories) => [
+          ...prevCategories,
+          { value: newCategory.trim(), label: newCategory.trim() },
+        ]);
+        setValue("category", newCategory.trim());
+        setNewCategory("");
+        setShowAddCategory(false);
+      } catch (error) {
+        console.error("Error adding category:", error);
+      }
     }
   };
 
@@ -146,6 +195,10 @@ const EditProduct = ({ rowId }: EditProductProps) => {
     }
   };
 
+  useEffect(() => {
+    getCategories();
+  }, []);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -153,7 +206,7 @@ const EditProduct = ({ rowId }: EditProductProps) => {
           <div className="relative">
             <div className="w-16 h-16 rounded-full border-4 border-blue-200 animate-spin border-t-blue-500" />
             <div className="mt-4 text-center text-blue-500 font-medium animate-pulse">
-            Loading...
+              Loading...
             </div>
           </div>
         </div>
@@ -242,7 +295,7 @@ const EditProduct = ({ rowId }: EditProductProps) => {
                             {categories.map((category) => (
                               <SelectItem
                                 key={category.value}
-                                value={category.value}
+                                value={category.label}
                               >
                                 {category.label}
                               </SelectItem>

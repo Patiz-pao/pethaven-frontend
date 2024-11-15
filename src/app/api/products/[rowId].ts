@@ -7,7 +7,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (method === "GET") {
     try {
-      const response = await axios.get(`http://localhost:8080/products/${rowId}`);
+      const response = await axios.get(`/products/${rowId}`);
       return res.status(200).json(response.data);
     } catch (error) {
       return res.status(500).json({ error: "ไม่สามารถดึงข้อมูลสินค้าได้" });
@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (method === "PUT") {
     try {
-      const response = await axios.put(`http://localhost:8080/products/${rowId}`, req.body);
+      const response = await axios.put(`/products/${rowId}`, req.body);
       return res.status(200).json(response.data);
     } catch (error) {
       return res.status(500).json({ error: "ไม่สามารถอัพเดตข้อมูลสินค้าได้" });

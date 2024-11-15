@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Switch, Textarea, Input, Label, Button } from "@/components/ui/";
 import axios from "axios";
@@ -53,12 +53,12 @@ const AddProducts = () => {
     },
   });
 
-  const [categories, setCategories] = useState([
-    { value: "Cat", label: "Cat" },
-    { value: "Dog", label: "Dog" },
-  ]);
+  const [categories, setCategories] = useState<
+    { value: string; label: string }[]
+  >([]);
   const [newCategory, setNewCategory] = useState("");
   const [showAddCategory, setShowAddCategory] = useState(false);
+
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -87,16 +87,46 @@ const AddProducts = () => {
     }
   };
 
-  const handleAddCategory = () => {
+  const getCategories = async () => {
+    try {
+      const response = await axios.get('/api/category');
+
+      if (Array.isArray(response.data)) {
+        const fetchedCategories = response.data.map((category: { name: string, rowid: string }) => ({
+          label: category.name,
+          value: category.rowid,
+        }));
+        setCategories(fetchedCategories);
+      } else if (response.data && response.data.data && Array.isArray(response.data.data)) {
+        const fetchedCategories = response.data.data.map((category: { name: string, rowid: string }) => ({
+          label: category.name,
+          value: category.rowid,
+        }));
+        setCategories(fetchedCategories);
+      } else {
+        console.error("Invalid data format: response.data is not an array or doesn't have 'data' array");
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
+
+  const handleAddCategory = async () => {
     if (newCategory.trim()) {
-      const newCategoryObj = {
-        value: newCategory.trim(),
-        label: newCategory.trim(),
-      };
-      setCategories((prevCategories) => [...prevCategories, newCategoryObj]);
-      setValue("category", newCategory.trim());
-      setNewCategory("");
-      setShowAddCategory(false);
+      try {
+        const response = await axios.post("/api/category", {
+          name: newCategory.trim(),
+        });
+        setCategories((prevCategories) => [
+          ...prevCategories,
+          { value: newCategory.trim(), label: newCategory.trim() },
+        ]);
+        setValue("category", newCategory.trim());
+        setNewCategory("");
+        setShowAddCategory(false);
+      } catch (error) {
+        console.error("Error adding category:", error);
+      }
     }
   };
 
@@ -106,6 +136,10 @@ const AddProducts = () => {
       setIsDialogOpen(true);
     }
   };
+
+  useEffect(() => {
+    getCategories();
+  }, []);
 
   return (
     <div className="min-h-screen bg-blue-100 py-8">
