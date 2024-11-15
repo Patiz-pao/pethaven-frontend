@@ -49,18 +49,10 @@ const Navbar = () => {
                 </li>
                 <li>
                   <Link
-                    href="/about"
+                    href="/admin"
                     className="text-gray-600 hover:text-orange-400 transition-colors duration-200"
                   >
-                    เกี่ยวกับเรา
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/contact"
-                    className="text-gray-600 hover:text-orange-400 transition-colors duration-200"
-                  >
-                    ติดต่อเรา
+                    Admin Management
                   </Link>
                 </li>
               </ul>
