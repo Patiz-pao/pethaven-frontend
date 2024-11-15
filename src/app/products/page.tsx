@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import axios from "axios";
 
 type RatingStarsProps = {
   rating: number;
@@ -48,6 +49,7 @@ const Products = () => {
   const { loading, products } = useProducts();
   const [priceRange, setPriceRange] = useState([0, 5000]);
   const [selectedBrand, setSelectedBrand] = useState("all");
+  const [isDeleting, setProducts] = useState(false);
 
   const handlePriceRangeChange = (values: number[]) => {
     setPriceRange([values[0], priceRange[1]]);
@@ -61,6 +63,15 @@ const Products = () => {
     return matchesPrice && matchesBrand;
   });
 
+  const handleDelete = async (productId: string) => {
+    try {
+      await axios.delete(`/api/products/${productId}`);
+      window.location.reload();
+    } catch (error) {
+      console.log("ไม่สามารถลบสินค้าได้");
+      
+    }
+  };
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -150,7 +161,7 @@ const Products = () => {
                     <Link href={`/products/edit/${product.rowid}`} passHref>
                       <Pencil className="h-4 w-4 text-white" />
                     </Link>
-                    <button>
+                    <button onClick={() => handleDelete(product.rowid)}>
                       <Trash2 className="h-4 w-4 text-white" />
                     </button>
                   </div>

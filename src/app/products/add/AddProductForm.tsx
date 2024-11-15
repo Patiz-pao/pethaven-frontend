@@ -222,7 +222,7 @@ const AddProducts = () => {
                             {categories.map((category) => (
                               <SelectItem
                                 key={category.value}
-                                value={category.value}
+                                value={category.label}
                               >
                                 {category.label}
                               </SelectItem>
