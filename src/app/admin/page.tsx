@@ -118,7 +118,7 @@ const AdminPage = () => {
   return (
     <div className="min-h-screen bg-blue-100">
       <div className="container mx-auto px-4 py-6">
-        <div className="p-8">
+        <div className="p-0 sm:p-8">
           <Card>
             <CardHeader>
               <CardTitle>จัดการสินค้า ({products.length})</CardTitle>
@@ -127,29 +127,34 @@ const AdminPage = () => {
               <div className="rounded-md border">
                 <div className="overflow-x-auto">
                   {" "}
-                  {/* Added responsive wrapper */}
                   <Table>
                     <thead>
                       <tr className="bg-gray-50">
-                        <th className="p-4 text-left">ID</th>
-                        <th className="p-4 text-left">ชื่อสินค้า</th>
-                        <th className="p-4 text-left">ราคา</th>
-                        <th className="p-4 text-left">สถานะ</th>
-                        <th className="p-4 text-left">จัดการ</th>
+                        <th className="hidden sm:table-cell p-4 text-center">
+                          ID
+                        </th>
+                        <th className="p-1 sm:p-4 text-center">ชื่อสินค้า</th>
+                        <th className="p-1 sm:p-4 text-center">ราคา</th>
+                        <th className="p-1 sm:p-4 text-center">สถานะ</th>
+                        <th className="p-1 sm:p-4 text-center">จัดการ</th>
                       </tr>
                     </thead>
                     <tbody>
                       {products.map((product, index) => (
                         <tr key={`product-${index}`} className="border-t">
-                          <td className="p-4">{product.rowid}</td>
-                          <td className="p-4">{product.name}</td>
-                          <td className="p-4">
+                          <td className="hidden sm:table-cell p-4 text-center">
+                            {product.rowid}
+                          </td>
+                          <td className="p-1 sm:p-4 text-center">
+                            {product.name}
+                          </td>
+                          <td className="p-1 sm:p-4 text-center">
                             {product.price.toLocaleString("th-TH", {
                               style: "currency",
                               currency: "THB",
                             })}
                           </td>
-                          <td className="p-4">
+                          <td className="p-1 sm:p-4 text-center">
                             <span
                               key={`status-${product.rowid}`}
                               className={`px-2 py-1 rounded text-sm ${
@@ -158,12 +163,10 @@ const AdminPage = () => {
                                   : "bg-red-100 text-red-800"
                               }`}
                             >
-                              {product.status === "Y"
-                                ? "เปิดใช้งาน"
-                                : "ปิดใช้งาน"}
+                              {product.status === "Y" ? "Active" : "InActive"}
                             </span>
                           </td>
-                          <td className="p-4">
+                          <td className="p-1 sm:p-4 text-center">
                             <Switch
                               key={`switch-${product.rowid}`}
                               checked={product.status === "Y"}
