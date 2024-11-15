@@ -1,9 +1,9 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Switch, Textarea, Input, Label, Button } from "@/components/ui/";
+import { Textarea, Input, Label, Button } from "@/components/ui/";
 import axios from "axios";
-import { CircleCheckBig, Plus } from "lucide-react";
+import { CircleArrowLeft, CircleCheckBig, Plus } from "lucide-react";
 
 import {
   Select,
@@ -26,6 +26,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const AddProducts = () => {
   const router = useRouter();
@@ -53,12 +54,12 @@ const AddProducts = () => {
     },
   });
 
-  const [categories, setCategories] = useState([
-    { value: "Cat", label: "Cat" },
-    { value: "Dog", label: "Dog" },
-  ]);
+  const [categories, setCategories] = useState<
+    { value: string; label: string }[]
+  >([]);
   const [newCategory, setNewCategory] = useState("");
   const [showAddCategory, setShowAddCategory] = useState(false);
+
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -87,16 +88,56 @@ const AddProducts = () => {
     }
   };
 
-  const handleAddCategory = () => {
+  const getCategories = async () => {
+    try {
+      const response = await axios.get("/api/category");
+
+      if (Array.isArray(response.data)) {
+        const fetchedCategories = response.data.map(
+          (category: { name: string; rowid: string }) => ({
+            label: category.name,
+            value: category.rowid,
+          })
+        );
+        setCategories(fetchedCategories);
+      } else if (
+        response.data &&
+        response.data.data &&
+        Array.isArray(response.data.data)
+      ) {
+        const fetchedCategories = response.data.data.map(
+          (category: { name: string; rowid: string }) => ({
+            label: category.name,
+            value: category.rowid,
+          })
+        );
+        setCategories(fetchedCategories);
+      } else {
+        console.error(
+          "Invalid data format: response.data is not an array or doesn't have 'data' array"
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  const handleAddCategory = async () => {
     if (newCategory.trim()) {
-      const newCategoryObj = {
-        value: newCategory.trim(),
-        label: newCategory.trim(),
-      };
-      setCategories((prevCategories) => [...prevCategories, newCategoryObj]);
-      setValue("category", newCategory.trim());
-      setNewCategory("");
-      setShowAddCategory(false);
+      try {
+        const response = await axios.post("/api/category", {
+          name: newCategory.trim(),
+        });
+        setCategories((prevCategories) => [
+          ...prevCategories,
+          { value: newCategory.trim(), label: newCategory.trim() },
+        ]);
+        setValue("category", newCategory.trim());
+        setNewCategory("");
+        setShowAddCategory(false);
+      } catch (error) {
+        console.error("Error adding category:", error);
+      }
     }
   };
 
@@ -107,10 +148,20 @@ const AddProducts = () => {
     }
   };
 
+  useEffect(() => {
+    getCategories();
+  }, []);
+
   return (
     <div className="min-h-screen bg-blue-100 py-8">
       <div className="container mx-auto max-w-2xl">
         <div className="bg-white rounded-lg shadow-lg p-6">
+          <Link href="/products">
+            <div className="flex items-center gap-2 mb-3 text-blue-500 hover:text-blue-700 font-medium transition duration-300">
+              <CircleArrowLeft className="h-6 w-6" />
+              <span>Back to Products</span>
+            </div>
+          </Link>
           <h1 className="text-2xl font-bold mb-6">Add New Product</h1>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -188,7 +239,7 @@ const AddProducts = () => {
                             {categories.map((category) => (
                               <SelectItem
                                 key={category.value}
-                                value={category.value}
+                                value={category.label}
                               >
                                 {category.label}
                               </SelectItem>

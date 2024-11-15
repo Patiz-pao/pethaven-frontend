@@ -11,9 +11,7 @@ const Navbar = () => {
     <nav className="bg-orange-100 py-2 border-b-2 border-orange-300 z-50">
       <div className="container mx-auto text-center lg:px-0 lg:p-0">
         <div className="h-auto">
-          <div className="text-blue-600 text-2xl font-bold py-4">
-            PetHaven
-          </div>
+          <div className="text-blue-600 text-2xl font-bold py-4">PetHaven</div>
 
           {isMobile && (
             <button
@@ -49,18 +47,10 @@ const Navbar = () => {
                 </li>
                 <li>
                   <Link
-                    href="/about"
+                    href="/admin"
                     className="text-gray-600 hover:text-orange-400 transition-colors duration-200"
                   >
-                    เกี่ยวกับเรา
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/contact"
-                    className="text-gray-600 hover:text-orange-400 transition-colors duration-200"
-                  >
-                    ติดต่อเรา
+                    Admin Management
                   </Link>
                 </li>
               </ul>
@@ -93,18 +83,10 @@ const Navbar = () => {
               </li>
               <li>
                 <Link
-                  href="/about"
-                  className="block text-gray-600 hover:text-orange-400 py-2 transition-all duration-200 hover:translate-x-1"
+                  href="/admin"
+                  className="text-gray-600 hover:text-orange-400 transition-colors duration-200"
                 >
-                  เกี่ยวกับเรา
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/contact"
-                  className="block text-gray-600 hover:text-orange-400 py-2 transition-all duration-200 hover:translate-x-1"
-                >
-                  ติดต่อเรา
+                  Admin Management
                 </Link>
               </li>
             </ul>

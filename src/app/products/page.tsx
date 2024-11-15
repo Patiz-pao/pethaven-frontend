@@ -12,6 +12,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogCancel,
+  AlertDialogAction,
+  AlertDialogDescription,
+} from "@/components/ui/alert-dialog";
+
+import axios from "axios";
 
 type RatingStarsProps = {
   rating: number;
@@ -47,20 +59,40 @@ const RatingStars = ({ rating }: RatingStarsProps) => {
 const Products = () => {
   const { loading, products } = useProducts();
   const [priceRange, setPriceRange] = useState([0, 5000]);
+
   const [selectedBrand, setSelectedBrand] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
 
   const handlePriceRangeChange = (values: number[]) => {
     setPriceRange([values[0], priceRange[1]]);
   };
 
   const filteredProducts = products.filter((product) => {
-    const matchesPrice =
-      product.price >= priceRange[0] && product.price <= priceRange[1];
-    const matchesBrand =
+    const matchBrand =
       selectedBrand === "all" || product.brand === selectedBrand;
-    return matchesPrice && matchesBrand;
+    const matchCategory =
+      selectedCategory === "all" || product.category === selectedCategory;
+    return matchBrand && matchCategory;
   });
 
+  const handleDelete = async (productId: string) => {
+    try {
+      await axios.delete(`/api/products/${productId}`);
+      window.location.reload();
+    } catch (error) {
+      console.log("ไม่สามารถลบสินค้าได้");
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    if (productToDelete) {
+      handleDelete(productToDelete);
+      setIsDialogOpen(false);
+    }
+  };
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -99,17 +131,39 @@ const Products = () => {
 
               <div className="mb-6">
                 <h3 className="text-sm font-medium mb-2">กรองตาม</h3>
+
                 <Select value={selectedBrand} onValueChange={setSelectedBrand}>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="ทุกๆ Brand" />
+                    <SelectValue placeholder="Brand โชว์ทั้งหมด" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectItem value="all">ทุกๆ Brand</SelectItem>
+                      <SelectItem value="all">Brand โชว์ทั้งหมด</SelectItem>
                       {Array.from(new Set(products.map((p) => p.brand))).map(
                         (brand) => (
                           <SelectItem key={brand} value={brand}>
                             {brand}
+                          </SelectItem>
+                        )
+                      )}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+
+                <Select
+                  value={selectedCategory}
+                  onValueChange={setSelectedCategory}
+                >
+                  <SelectTrigger className="w-full mt-4">
+                    <SelectValue placeholder="Category โชว์ทั้งหมด" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="all">Category โชว์ทั้งหมด</SelectItem>
+                      {Array.from(new Set(products.map((p) => p.category))).map(
+                        (category) => (
+                          <SelectItem key={category} value={category}>
+                            {category}
                           </SelectItem>
                         )
                       )}
@@ -150,9 +204,40 @@ const Products = () => {
                     <Link href={`/products/edit/${product.rowid}`} passHref>
                       <Pencil className="h-4 w-4 text-white" />
                     </Link>
-                    <button>
+
+                    <button
+                      onClick={() => {
+                        setProductToDelete(product.rowid);
+                        setIsDialogOpen(true);
+                      }}
+                    >
                       <Trash2 className="h-4 w-4 text-white" />
                     </button>
+                    <AlertDialog
+                      open={isDialogOpen}
+                      onOpenChange={setIsDialogOpen}
+                    >
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Confirm product deletion
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete this product?
+                            Deletion cannot be reversed.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={handleConfirmDelete}
+                            className="bg-blue-500 hover:bg-blue-600"
+                          >
+                            Confirm
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                   <img
                     src={product.imageUrl}
