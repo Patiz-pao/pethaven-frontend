@@ -1,5 +1,11 @@
 # Pet Haven Frontend
 
+⚠️ คำเตือน / Warning
+Free Hosting Auto-Sleep
+- เนื่องจาก API ถูก deploy ด้วยบริการโฮสติ้งฟรี อาจมีการเข้าสู่โหมดพัก (auto-sleep) หลังจากไม่มีการใช้งานเป็นเวลานาน เมื่อมีการเรียกใช้ API ครั้งแรกหลังจากโหมดพัก อาจต้องรอประมาณ 5-10 นาที เพื่อให้ API กลับมาทำงานอีกครั้ง
+Free Hosting Auto-Sleep
+- The API is deployed using a free hosting service, which may enter an auto-sleep mode after being idle for a while. The first API call after the sleep mode may require a wait time of 5-10 minutes for the API to resume operation.
+
 Pet Haven Frontend เป็นโปรเจค **Next.js** ที่ใช้ **TypeScript**, **Tailwind CSS**, **React Hook Form**, **Axios**, และ **Shadcn UI** สำหรับพัฒนา UI ที่เชื่อมต่อกับ API ของ Pet Haven  
 โปรเจคนี้สนับสนุนการทำงานของเว็บไซต์ [Pet Haven Shop](https://pet-haven-shop.netlify.app) โดยให้ผู้ใช้สามารถทำการสมัครสมาชิก, ดูสินค้า, และทำการสั่งซื้อออนไลน์ได้อย่างสะดวกและง่ายดาย  
 
